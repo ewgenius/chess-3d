@@ -1,5 +1,5 @@
 import {
-  Engine, Scene, FreeCamera, Vector3, HemisphericLight,
+  Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight,
   MeshBuilder, Material, StandardMaterial, Color3, Mesh
 } from 'babylonjs';
 import { debounce } from './utils';
@@ -7,6 +7,7 @@ import { debounce } from './utils';
 const CELL_WIDTH = 1;
 const CELL_HEIGHT = 1;
 const BOARD_HEIGHT = 0.2;
+const CELLS_COUNT = 8;
 
 function addCell(x: number, z: number, material: Material, scene: Scene, parent: Mesh) {
   const cell = MeshBuilder.CreateBox(`cell-${x}-${z}`, {
@@ -26,16 +27,16 @@ function addBoard(scene: Scene) {
   white.diffuseColor = Color3.White();
 
   const board = MeshBuilder.CreateBox('board', {
-    size: CELL_HEIGHT * 8,
-    width: CELL_WIDTH * 8,
+    size: CELL_HEIGHT * CELLS_COUNT,
+    width: CELL_WIDTH * CELLS_COUNT,
     height: BOARD_HEIGHT
   }, scene);
 
-  for (let i = 0; i < 8; i++) {
-    for (let j = 0; j < 8; j++) {
+  for (let i = 0; i < CELLS_COUNT; i++) {
+    for (let j = 0; j < CELLS_COUNT; j++) {
       const cell = addCell(i, j, (i + j) % 2 === 0 ? black : white, scene, board);
-      cell.position.x = i - 3.5 * CELL_HEIGHT;
-      cell.position.z = j - 3.5 * CELL_HEIGHT;
+      cell.position.x = i - (CELLS_COUNT - 1) * CELL_HEIGHT / 2;
+      cell.position.z = j - (CELLS_COUNT - 1) * CELL_HEIGHT / 2;
       cell.position.y = BOARD_HEIGHT;
     }
   }
@@ -48,7 +49,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const engine = new Engine(canvas);
 
   const scene = new Scene(engine);
-  const camera = new FreeCamera('camera', new Vector3(0, 5, -10), scene);
+  const camera = new ArcRotateCamera('camera', 0, 0.5, 20, Vector3.Zero(), scene);
   camera.setTarget(Vector3.Zero());
   camera.attachControl(canvas, false);
 
